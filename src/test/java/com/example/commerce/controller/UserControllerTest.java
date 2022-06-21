@@ -44,7 +44,7 @@ class UserControllerTest {
 
 
     @Test
-    @DisplayName("회원가입 정상 작동")
+    @DisplayName("Join Complete")
     public void saveComplete() throws Exception{
         /*
         * 정상적으로 조건을 지키면 save가 된 뒤, 정보 저장
