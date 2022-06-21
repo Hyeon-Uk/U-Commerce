@@ -3,7 +3,6 @@ package com.example.commerce.service;
 import com.example.commerce.dto.req.JoinFormDto;
 import com.example.commerce.entity.User;
 import com.example.commerce.repository.UserRepository;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +11,10 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    //임시 인코딩 함수(리버스로 반환)
     public String encodePassword(String password){
-        return BCrypt.hashpw(password,BCrypt.gensalt());
+        StringBuilder sb=new StringBuilder(password);
+        return sb.reverse().toString();
     }
 
     public User join(JoinFormDto joinFormDto){
