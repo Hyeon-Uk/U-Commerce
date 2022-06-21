@@ -22,7 +22,6 @@ public class UserController {
 
     @PostMapping("/join/process")
     public String joinProcess(JoinFormDto formDto){
-        log.info("user email={},name={},password={}",formDto.getEmail(),formDto.getName(),formDto.getPassword());
         userService.join(formDto);
         return "redirect:/";
     }
