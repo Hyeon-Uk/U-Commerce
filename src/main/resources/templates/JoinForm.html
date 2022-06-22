@@ -3,29 +3,99 @@
   <head>
     <title>U-Commerce-join</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="/static/css/bootstrap.css" rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <style>
+      label{
+        font-size:13px;
+      }
+      .card{
+        background-color:rgba(200,200,200,0.2);
+      }
+      #submitBtn{
+        background-color:white;
+      }
+      #submitBtn:hover{
+        background-color:rgba(200,200,200,0.2);
+        border-color:white;
+        color:white !important;
+      }
+      .errors{
+        font-size:8px;
+        color:red;
+        padding-left:10px;
+        padding-top:3px;
+      }
+      .error-box{
+        border-color:red;
+      }
+    </style>
+
   </head>
   <body>
-    <form action="/users/join" method="post"
-          th:action="@{/users/join/process}" th:method="post">
-      <label for="email">email : </label>
-      <input type="email" name="email" id="email"><br/>
+    <section class="vh-100">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body p-5" id="main-body">
+              <h2 class="text-uppercase text-center mb-5">Create an account</h2>
 
-      <label for="password">password: </label>
-      <input type="password" name="password" id="password"><br/>
+              <form action="/users/join/process" method="post"
+                    th:action="@{/users/join/process}" th:method="post"
+                    th:object="${joinFormDto}">
 
-      <label for="passwordchk">password check: </label>
-      <input type="password" name="passwordchk" id="passwordchk"><br/>
+                <div class="form-floating mb-3">
+                  <input th:field="*{email}" type="text" class="form-control" th:classappend="${#fields.hasErrors('email') ? 'error-box' : ''}" id="email" name="email" placeholder="Email address" th:required="true">
+                  <label for="email">Email address</label>
+                  <div class="errors" th:errors="*{email}">
+                    이메일 오류
+                  </div>
+                </div>
 
-      <label for="name">name: </label>
-      <input type="text" name="name" id="name"><br/>
+                <div class="form-floating mb-3">
+                  <input th:field="*{name}" type="text" class="form-control" id="name" name="name" placeholder="Name" th:required="true">
+                  <label for="name">Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input th:field="*{password}" type="password" class="form-control" th:classappend="${#fields.hasErrors('password') ? 'error-box' : ''}" id="password" name="password" placeholder="Password" th:required="true">
+                  <label for="password">Password</label>
+                  <div class="errors" th:errors="*{password}">
+                    비밀번호 오류
+                  </div>
+                </div>
+                <div class="form-floating mb-3">
+                  <input th:field="*{passwordCheck}" type="password" class="form-control" th:classappend="${#fields.hasErrors('passwordCheck') ? 'error-box' : ''}" id="passwordCheck" name="passwordCheck" placeholder="Password Check" th:required="true">
+                  <label for="passwordCheck">Password Check</label>
+                  <div class="errors" th:errors="*{passwordCheck}">
+                    비밀번호 확인 오류
+                  </div>
+                </div>
+                <div class="form-floating mb-3">
+                  <input th:field="*{address}" type="text" class="form-control" id="address" name="address" placeholder="Address" th:required="true">
+                  <label for="address">Address</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input th:field="*{phone}" type="text" class="form-control" id="phone" name="phone" placeholder="Phone" th:required="true">
+                  <label for="phone">Phone</label>
+                </div>
 
-      <label for="address">address: </label>
-      <input type="text" name="address" id="address"><br/>
+                <div class="d-flex justify-content-center">
+                  <button type="submit"
+                    class="btn btn-block btn-lg text-body" id="submitBtn" >Register</button>
+                </div>
 
-      <label for="phone">phone(xxx-xxxx-xxxx): </label>
-      <input type="text" name="phone" id="phone"><br/>
+                <p class="text-center text-muted mt-5 mb-0">Have already an account? 
+                  <a href="/users/login" th:href="@{/users/login}"
+                    class="fw-bold text-body"><u>Login here</u></a></p>
+              </form>
 
-      <input type="submit">
-    </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
   </body>
 </html>

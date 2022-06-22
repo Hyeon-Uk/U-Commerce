@@ -10,17 +10,13 @@ import org.springframework.stereotype.Service;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-
-    //임시 인코딩 함수(리버스로 반환)
-    public String encodePassword(String password){
-        StringBuilder sb=new StringBuilder(password);
-        return sb.reverse().toString();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public User join(JoinFormDto joinFormDto){
         User user=User.builder()
                 .email(joinFormDto.getEmail())
-                .password(encodePassword(joinFormDto.getPassword()))
+                .password(passwordEncoder.encodePassword(joinFormDto.getPassword()))
                 .name(joinFormDto.getName())
                 .address(joinFormDto.getAddress())
                 .phone(joinFormDto.getPhone())
