@@ -1,6 +1,7 @@
 package com.example.commerce.controller;
 
 import com.example.commerce.dto.req.JoinFormDto;
+import com.example.commerce.dto.req.LoginFormDto;
 import com.example.commerce.entity.User;
 import com.example.commerce.repository.UserRepository;
 import com.example.commerce.service.UserService;
@@ -11,7 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.PostConstruct;
 
 @Controller
 @Slf4j
@@ -55,6 +59,30 @@ public class UserController {
         }
 
         userService.join(formDto);
+        return "redirect:/users/login";
+    }
+
+    @GetMapping("/login")
+    public String login(Model model){
+        model.addAttribute(new LoginFormDto());//이메일 저장을 대비
+        return "LoginForm";
+    }
+
+    public void loginFormValidator(LoginFormDto loginFormDto, BindingResult bindingResult){
+        User user=userService.login(loginFormDto);
+        if(user==null){
+            log.info("로그인 validation 에러");
+            bindingResult.addError(new ObjectError("loginFormDto","이메일과 패스워드를 확인해주세요"));
+            return;
+        }
+    }
+
+    @PostMapping("/login/process")
+    public String loginProcess(LoginFormDto loginFormDto,Model model,BindingResult bindingResult){
+        loginFormValidator(loginFormDto,bindingResult);
+        if(bindingResult.hasErrors()){
+            return "loginForm";
+        }
         return "redirect:/";
     }
 }

@@ -19,6 +19,14 @@
         border-color:white;
         color:white !important;
       }
+      .errors{
+        font-size:8px;
+        color:red;
+        padding-left:10px;
+        padding-top:3px;
+        width:100%;
+        text-align:center;
+      }
     </style>
 
   </head>
@@ -34,19 +42,26 @@
       
                       <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
       
-                      <form class="mx-1 mx-md-4" th:action="@{/users/login/process}" th:method="post">
+                      <form class="mx-1 mx-md-4"
+                            th:action="@{/users/login/process}"
+                            th:object="${loginFormDto}"
+                            th:method="post">
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Email address">
+                            <input th:field="*{email}"
+                                    type="email" class="form-control" id="email" name="email" placeholder="Email address">
                             <label for="email">Email address</label>
                           </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="password" name="password" placeholder="Password">
+                            <input th:field="*{password}" type="password" class="form-control" id="password" name="password" placeholder="Password">
                             <label for="password">Password</label>
                           </div>
                         <div class="d-flex justify-content-center">
                             <button type="submit"
                               class="btn btn-block btn-lg text-body" id="submitBtn" >Register</button>
                           </div>
+                        <div class="errors" th:errors="${loginFormDto}">
+                          이메일 오류
+                        </div>
                           <p class="text-center text-muted mt-5 mb-0">Not a member yet? 
                             <a href="/users/join" th:href="@{/users/join}"
                               class="fw-bold text-body"><u>Join here</u></a></p>

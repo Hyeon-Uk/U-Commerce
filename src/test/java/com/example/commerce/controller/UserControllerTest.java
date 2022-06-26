@@ -1,7 +1,9 @@
 package com.example.commerce.controller;
 
+import com.example.commerce.dto.req.JoinFormDto;
 import com.example.commerce.entity.User;
 import com.example.commerce.repository.UserRepository;
+import com.example.commerce.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +44,8 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
 
     @Test
     @DisplayName("Join Complete")
@@ -50,6 +54,7 @@ class UserControllerTest {
         /*
         * 정상적으로 조건을 지키면 save가 된 뒤, 정보 저장
         * */
+        int before_size=userRepository.findAll().size();
         MultiValueMap<String,String> user=new LinkedMultiValueMap<>();
         user.add("email","test1@naver.com");
         user.add("name","kim");
@@ -62,12 +67,12 @@ class UserControllerTest {
                         .contentType(MediaType.ALL)
                         .params(user))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"))
+                .andExpect(redirectedUrl("/users/login"))
                 .andDo(print());
 
         //저장이 됐는지 확인
         List<User> users=userRepository.findAll();
-        assertThat(users.size()).isEqualTo(1);
+        assertThat(users.size()).isEqualTo(before_size+1);
     }
 
     @Test
@@ -77,9 +82,9 @@ class UserControllerTest {
         /**
          * 이메일 중복시 에러메세지를 가지고 joinForm으로 돌아가기
          */
-
         User user=new User("kim","test1@gmail.com","test","test","test",0);
         userRepository.save(user);
+        int before_size=userRepository.findAll().size();
 
 
         MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
@@ -94,7 +99,7 @@ class UserControllerTest {
                 .andExpect(model().hasErrors())
                 .andReturn();
 
-        assertThat(userRepository.findAll().size()).isEqualTo(1);//저장안됨
+        assertThat(userRepository.findAll().size()).isEqualTo(before_size);//저장안됨
     }
 
     @Test
@@ -104,6 +109,7 @@ class UserControllerTest {
         /**
          * 비밀번호와 비밀번호 확인을 다르게하면 오류
          */
+        int before_size=userRepository.findAll().size();
         MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
         user1.add("email","test1@naver.com");
         user1.add("name","kim");
@@ -115,7 +121,7 @@ class UserControllerTest {
         MvcResult result = mockMvc.perform(post("/users/join/process").params(user1))
                 .andExpect(model().hasErrors())
                 .andReturn();
-        assertThat(userRepository.findAll().size()).isEqualTo(0);//저장안됨
+        assertThat(userRepository.findAll().size()).isEqualTo(before_size);//저장안됨
     }
 
     @Test
@@ -125,6 +131,7 @@ class UserControllerTest {
         /**
          * 비밀번호 조건을 못맞추면 오류
          */
+        int before_size=userRepository.findAll().size();
         MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
         user1.add("email","test1@naver.com");
         user1.add("name","kim");
@@ -136,6 +143,63 @@ class UserControllerTest {
         MvcResult result = mockMvc.perform(post("/users/join/process").params(user1))
                 .andExpect(model().hasErrors())
                 .andReturn();
-        assertThat(userRepository.findAll().size()).isEqualTo(0);//저장안됨
+        assertThat(userRepository.findAll().size()).isEqualTo(before_size);//저장안됨
+    }
+
+    @Test
+    @DisplayName("Login Success")
+    @Transactional
+    public void loginSuccess() throws Exception {
+        /**
+         *  로그인 성공
+         */
+        JoinFormDto joinFormDto=new JoinFormDto("test","test1@naver.com","Test123!@","Test123!@","test","test");
+        userService.join(joinFormDto);
+
+        MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
+        user1.add("email","test1@naver.com");
+        user1.add("password","Test123!@");
+
+        MvcResult result = mockMvc.perform(post("/users/login/process").params(user1))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Login fail ( email not found)")
+    @Transactional
+    public void loginEmailNotFount() throws Exception {
+        /**
+         *  로그인 실패 ( 이메일 잘못입력 )
+         */
+        JoinFormDto joinFormDto=new JoinFormDto("test","test1@naver.com","Test123!@","Test123!@","test","test");
+        userService.join(joinFormDto);
+
+        MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
+        user1.add("email","t@naver.com");
+        user1.add("password","Test123!@");
+
+        MvcResult result = mockMvc.perform(post("/users/login/process").params(user1))
+                .andExpect(model().hasErrors())
+                .andReturn();
+    }
+    @Test
+    @DisplayName("Login fail (password not matchs)")
+    @Transactional
+    public void loginPasswordNotMatchs() throws Exception {
+        /**
+         *  로그인 실패 ( 비밀번호 일치 x)
+         */
+        JoinFormDto joinFormDto=new JoinFormDto("test","test1@naver.com","Test123!@","Test123!@","test","test");
+        userService.join(joinFormDto);
+
+        MultiValueMap<String,String> user1=new LinkedMultiValueMap<>();
+        user1.add("email","test1@naver.com");
+        user1.add("password","Test");
+
+        MvcResult result = mockMvc.perform(post("/users/login/process").params(user1))
+                .andExpect(model().hasErrors())
+                .andReturn();
     }
 }
