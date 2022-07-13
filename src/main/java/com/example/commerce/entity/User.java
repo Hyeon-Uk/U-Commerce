@@ -1,21 +1,18 @@
 package com.example.commerce.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import lombok.*;
+
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString
+@Entity
 @Table(name="users")
-public class User {
+public class User extends BaseEntity{
     @Id
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
